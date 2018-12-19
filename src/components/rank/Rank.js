@@ -2,7 +2,7 @@ import React from 'react';
 
 const Rank = () => {
     return (
-        <div>
+        <div className='mt6'> 
             <div className='white f3'>
                 {'Viraj, your current rank is...'}
             </div>
