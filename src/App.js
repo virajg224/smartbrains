@@ -9,7 +9,7 @@ import Rank from './components/rank/Rank';
 import Clarifai from 'clarifai';
 
 const app = new Clarifai.App({
- apiKey: ''
+ apiKey: '29f5b905dc96470bbbee71a688900f6c'
 });
 
 
@@ -19,7 +19,7 @@ class App extends Component {
     this.state = {
       input: '',
       imageUrl: '',
-      boxSet: {},
+      boxSet: [],
       route: 'signin',
       isSignedIn: false,
     }
@@ -27,9 +27,19 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signin' || route === 'register') {
-      this.setState({isSignedIn: false});
+      this.setState({
+        isSignedIn: false,
+        input: '',
+        imageUrl: '',
+        boxSet: [],      
+        });
     } else {
-      this.setState({isSignedIn: true});
+      this.setState({
+        isSignedIn: true,
+        input: '',
+        imageUrl: '',
+        boxSet: [],        
+      });
     }
     this.setState({route: route});
   }
@@ -59,6 +69,7 @@ class App extends Component {
         bottomRow: imageHeight - (faceBoundries.bottom_row * imageHeight),
       })
     })
+    return boxSet;
   }
 
   displayFace = (boxSet) => {
