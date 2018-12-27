@@ -22,6 +22,13 @@ class App extends Component {
       boxSet: [],
       route: 'signin',
       isSignedIn: false,
+      user: {
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: ''
+      }
     }
   }
 
@@ -51,8 +58,25 @@ class App extends Component {
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input});
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then(response => this.displayFace(this.calculateFace(response)))
-      .catch(e => console.log(e))
+      .then(response => {
+        if (response) {
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: {'Content-Type' : 'application/json'},
+            body: JSON.stringify({
+              id: this.state.user.id,
+            })
+        })
+          .then(response => response.json())
+          .then(entries => {
+            if (entries){
+              this.setState(Object.assign(this.state.user, { entries: entries }))
+            }
+          })
+        }
+        this.displayFace(this.calculateFace(response))
+      })
+      .catch(e => console.log("Error", e))
   }
 
   calculateFace = (data) => {
@@ -76,15 +100,25 @@ class App extends Component {
     this.setState({boxSet: boxSet})
   }
 
+  loadUser = (user) => {
+    this.setState({user : {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        entries: user.entries,
+        joined: user.joined
+    }})
+  }
+
   render() {
     return (
       <div className="App">
         <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn}/>
-        { this.state.route === 'signin' && <SignIn onRouteChange={this.onRouteChange} /> }
-        { this.state.route === 'register' && <Register onRouteChange={this.onRouteChange} /> }
+        { this.state.route === 'signin' && <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> }
+        { this.state.route === 'register' && <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> }
         { this.state.route === 'home' && 
           <div>
-            <Rank />
+            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm onSubmit={this.onButtonSubmit} onInputChange={this.onInputChange}/>
             <FaceRecognition imageUrl={this.state.imageUrl} boxSet={this.state.boxSet}/>
           </div> }
