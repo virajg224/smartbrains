@@ -28,7 +28,8 @@ class App extends Component {
         email: '',
         entries: 0,
         joined: ''
-      }
+      },
+      pictureError: false,
     }
   }
 
@@ -56,7 +57,10 @@ class App extends Component {
   }
 
   onButtonSubmit = () => {
-    this.setState({imageUrl: this.state.input});
+    this.setState({
+      imageUrl: this.state.input,
+      pictureError: true
+      });
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       .then(response => {
         if (response) {
@@ -76,7 +80,10 @@ class App extends Component {
         }
         this.displayFace(this.calculateFace(response))
       })
-      .catch(e => console.log("Error", e))
+      .catch(e => {
+        console.log("Error", e)
+        this.setState({pictureError: true})
+      })
   }
 
   calculateFace = (data) => {

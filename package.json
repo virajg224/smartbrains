@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^4.2.1",
     "clarifai": "^2.9.0",
     "cors": "^2.8.5",
     "react": "^16.6.3",
