@@ -3,7 +3,7 @@ import './App.css';
 import Navigation from './components/navigation/Navigation';
 import FaceRecognition from './components/faceRecognition/FaceRecognition';
 import ImageLinkForm from './components/imageLinkForm/ImageLinkForm';
-import Register from './components/Register/Register';
+import Register from './components/register/Register';
 import SignIn from './components/signin/SignIn';
 import Rank from './components/rank/Rank';
 import Clarifai from 'clarifai';
@@ -11,7 +11,6 @@ import Clarifai from 'clarifai';
 const app = new Clarifai.App({
  apiKey: '29f5b905dc96470bbbee71a688900f6c'
 });
-
 
 class App extends Component {
   constructor() {
@@ -29,7 +28,6 @@ class App extends Component {
         entries: 0,
         joined: ''
       },
-      pictureError: false,
     }
   }
 
@@ -39,17 +37,19 @@ class App extends Component {
         isSignedIn: false,
         input: '',
         imageUrl: '',
-        boxSet: [],      
+        boxSet: [],    
+        route: route,  
         });
     } else {
       this.setState({
         isSignedIn: true,
         input: '',
         imageUrl: '',
-        boxSet: [],        
+        boxSet: [],  
+        route: route,  
+       
       });
     }
-    this.setState({route: route});
   }
 
   onInputChange = (e) => {
@@ -59,8 +59,7 @@ class App extends Component {
   onButtonSubmit = () => {
     this.setState({
       imageUrl: this.state.input,
-      pictureError: true
-      });
+    });
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       .then(response => {
         if (response) {
@@ -73,7 +72,7 @@ class App extends Component {
         })
           .then(response => response.json())
           .then(entries => {
-            if (entries){
+            if (entries) {
               this.setState(Object.assign(this.state.user, { entries: entries }))
             }
           })
@@ -82,7 +81,6 @@ class App extends Component {
       })
       .catch(e => {
         console.log("Error", e)
-        this.setState({pictureError: true})
       })
   }
 
@@ -109,18 +107,18 @@ class App extends Component {
 
   loadUser = (user) => {
     this.setState({user : {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        entries: user.entries,
-        joined: user.joined
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      entries: user.entries,
+      joined: user.joined
     }})
   }
 
   render() {
     return (
       <div className="App">
-        <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn}/>
+        <Navigation onRouteChange={this.onRouteChange} currentRoute={this.state.route}/>
         { this.state.route === 'signin' && <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> }
         { this.state.route === 'register' && <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} /> }
         { this.state.route === 'home' && 
